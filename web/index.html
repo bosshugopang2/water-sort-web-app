@@ -3,32 +3,89 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Water Sort Puzzle Game + Solver</title>
+  <title>Water Sort Puzzle - 100 Levels</title>
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
   <div class="app">
-    <header class="topbar">
-      <h1>Water Sort Puzzle</h1>
-      <div class="status" id="statusText">Select a bottle to move from.</div>
+    <!-- Header -->
+    <header class="header">
+      <div class="header-left">
+        <button id="backBtn" class="icon-btn" title="Back">←</button>
+        <span class="level-display">Level <span id="levelNum">1</span>/100</span>
+      </div>
+      <div class="header-center">
+        <h1>Water Sort</h1>
+      </div>
+      <div class="header-right">
+        <div class="moves-counter">
+          <span class="moves-label">Moves:</span>
+          <span id="movesCount" class="moves-number">0</span>
+        </div>
+      </div>
     </header>
 
-    <section class="controls">
-      <button id="resetBtn">Reset</button>
-      <button id="exampleBtn">Example Puzzle</button>
-      <button id="solveBtn" class="primary">Solve for Me</button>
-    </section>
+    <!-- Main Game Area -->
+    <main class="game-container">
+      <div class="board-container">
+        <div id="board" class="board" role="application" aria-label="Water sort puzzle board"></div>
+      </div>
 
-    <section class="board-wrap">
-      <div id="board" class="board" aria-label="Water sort board"></div>
-    </section>
+      <!-- Status Message -->
+      <div class="status-box" id="statusBox">
+        <span id="statusText">Tap a bottle to select it</span>
+      </div>
 
-    <section class="solution-panel">
-      <h2>Solution</h2>
-      <ol id="movesList"></ol>
-    </section>
+      <!-- Action Buttons -->
+      <div class="action-buttons">
+        <button id="resetBtn" class="btn btn-secondary">Reset</button>
+        <button id="solveBtn" class="btn btn-primary">Show Solution</button>
+      </div>
+    </main>
+
+    <!-- Solution Panel -->
+    <div class="solution-panel" id="solutionPanel">
+      <div class="solution-header">
+        <h3>Solution (<span id="movesTotal">0</span> moves)</h3>
+        <button id="closeSolutionBtn" class="close-btn">✕</button>
+      </div>
+      <ol id="movesList" class="moves-list"></ol>
+    </div>
+
+    <!-- Level Complete Modal -->
+    <div class="modal hidden" id="completeModal">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h2>Level Complete! 🎉</h2>
+        </div>
+        <div class="modal-body">
+          <p id="levelCompleteText">You completed Level 1 in 5 moves!</p>
+          <div class="stars">
+            <span class="star" id="star1">★</span>
+            <span class="star" id="star2">★</span>
+            <span class="star" id="star3">★</span>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button id="nextLevelBtn" class="btn btn-primary">Next Level</button>
+          <button id="retryBtn" class="btn btn-secondary">Retry</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Level Select Modal -->
+    <div class="modal hidden" id="levelSelectModal">
+      <div class="modal-content level-select-modal">
+        <div class="modal-header">
+          <h2>Select Level</h2>
+          <button id="closeLevelSelectBtn" class="close-btn">✕</button>
+        </div>
+        <div class="level-grid" id="levelGrid"></div>
+      </div>
+    </div>
   </div>
 
+  <script src="levels.js"></script>
   <script src="script.js"></script>
 </body>
 </html>

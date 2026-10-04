@@ -1,22 +1,43 @@
 const EMPTY = "EMPTY";
-const examplePuzzle = {
-  bottles: [
-    ["GREEN", "RED", "RED", "RED"],
-    ["GREEN", "GREEN", "GREEN", "RED"],
-    ["EMPTY", "EMPTY", "EMPTY", "EMPTY"]
-  ]
+
+const colorMap = {
+  RED: "color-red",
+  GREEN: "color-green",
+  BLUE: "color-blue",
+  YELLOW: "color-yellow",
+  PINK: "color-pink",
+  ORANGE: "color-orange",
+  PURPLE: "color-purple",
+  GRAY: "color-gray",
+  COFFEE: "color-coffee",
+  DARK_GREEN: "color-dark-green",
+  DARK_BLUE: "color-dark-blue",
+  LIGHT_GREEN: "color-light-green",
+  BLACK: "color-black",
+  WHITE: "color-white",
 };
 
 const boardEl = document.getElementById("board");
 const statusText = document.getElementById("statusText");
 const movesList = document.getElementById("movesList");
+const movesCount = document.getElementById("movesCount");
+const levelNum = document.getElementById("levelNum");
 const resetBtn = document.getElementById("resetBtn");
-const exampleBtn = document.getElementById("exampleBtn");
 const solveBtn = document.getElementById("solveBtn");
+const completeModal = document.getElementById("completeModal");
+const levelSelectModal = document.getElementById("levelSelectModal");
+const solutionPanel = document.getElementById("solutionPanel");
+const backBtn = document.getElementById("backBtn");
+const closeSolutionBtn = document.getElementById("closeSolutionBtn");
+const nextLevelBtn = document.getElementById("nextLevelBtn");
+const retryBtn = document.getElementById("retryBtn");
+const closeLevelSelectBtn = document.getElementById("closeLevelSelectBtn");
 
-let originalPuzzle = JSON.parse(JSON.stringify(examplePuzzle.bottles));
-let gameState = cloneState(originalPuzzle);
+let currentLevel = 1;
+let gameState = [];
+let originalPuzzle = [];
 let selectedBottle = null;
+let movesMade = 0;
 
 function cloneState(state) {
   return state.map((bottle) => [...bottle]);
@@ -90,6 +111,8 @@ function performPour(sourceIndex, targetIndex) {
 
   from[fromIndexTop] = EMPTY;
   to[targetEmptyIndex] = sourceColor;
+  movesMade++;
+  movesCount.textContent = movesMade;
   return true;
 }
 
@@ -115,46 +138,25 @@ function renderBoard() {
     bottleEl.setAttribute("role", "button");
     bottleEl.setAttribute("tabindex", "0");
 
-    bottle.forEach((cellValue, cellIndex) => {
+    bottle.forEach((cellValue) => {
       const cell = document.createElement("div");
       const empty = isEmptyCell(cellValue);
-      cell.className = `cell ${empty ? "empty" : ""}`;
-      cell.style.background = empty ? "rgba(148,163,184,0.18)" : getColor(cellValue);
-      cell.textContent = empty ? "" : cellValue;
+      cell.className = `cell ${empty ? "empty" : colorMap[cellValue] || "empty"}`;
       bottleEl.appendChild(cell);
     });
 
     bottleEl.addEventListener("click", () => handleBottleClick(index));
+    bottleEl.addEventListener("keypress", (e) => {
+      if (e.key === "Enter") handleBottleClick(index);
+    });
     boardEl.appendChild(bottleEl);
   });
-}
-
-function getColor(value) {
-  const palette = {
-    RED: "#ef4444",
-    GREEN: "#22c55e",
-    BLUE: "#3b82f6",
-    YELLOW: "#facc15",
-    PINK: "#ec4899",
-    ORANGE: "#f97316",
-    PURPLE: "#a855f7",
-    GRAY: "#94a3b8",
-    COFFEE: "#a16207",
-    DARK_GREEN: "#166534",
-    DARK_BLUE: "#1d4ed8",
-    LIGHT_GREEN: "#4ade80",
-    BLACK: "#111827",
-    WHITE: "#f8fafc",
-    EMPTY: "#cbd5e1",
-  };
-
-  return palette[value] || "#cbd5e1";
 }
 
 function handleBottleClick(index) {
   if (selectedBottle === null) {
     selectedBottle = index;
-    statusText.textContent = `Selected bottle ${index + 1}. Choose another bottle to pour into.`;
+    statusText.textContent = `Bottle ${index + 1} selected. Tap another bottle to pour.`;
     renderBoard();
     return;
   }
@@ -168,70 +170,124 @@ function handleBottleClick(index) {
 
   const success = performPour(selectedBottle, index);
   if (!success) {
-    statusText.textContent = "That move is not allowed.";
-    selectedBottle = index;
+    statusText.textContent = "Invalid move!";
+    selectedBottle = null;
     renderBoard();
     return;
   }
 
   selectedBottle = null;
-  statusText.textContent = `Moved from bottle ${selectedBottle + 1} to bottle ${index + 1}.`;
+  statusText.textContent = `Poured bottle ${selectedBottle + 1} into bottle ${index + 1}.`;
   renderBoard();
 
   if (isSolved(gameState)) {
-    statusText.textContent = "You solved the puzzle!";
+    showCompleteModal();
   }
 }
 
 function resetGame() {
   gameState = cloneState(originalPuzzle);
   selectedBottle = null;
-  movesList.innerHTML = "";
-  statusText.textContent = "Puzzle reset. Select a bottle to start.";
+  movesMade = 0;
+  movesCount.textContent = "0";
+  solutionPanel.classList.remove("visible");
+  statusText.textContent = "Tap a bottle to select it";
   renderBoard();
 }
 
-function loadExample() {
-  originalPuzzle = JSON.parse(JSON.stringify(examplePuzzle.bottles));
+function loadLevel(level) {
+  if (level < 1 || level > LEVELS.length) return;
+  
+  currentLevel = level;
+  levelNum.textContent = currentLevel;
+  originalPuzzle = JSON.parse(JSON.stringify(LEVELS[currentLevel - 1]));
   resetGame();
+  completeModal.classList.add("hidden");
+  levelSelectModal.classList.add("hidden");
+}
+
+function showCompleteModal() {
+  const starsEarned = Math.max(3 - Math.floor(movesMade / 5), 1);
+  document.getElementById("levelCompleteText").textContent =
+    `You completed Level ${currentLevel} in ${movesMade} moves!`;
+  
+  // Clear stars
+  for (let i = 1; i <= 3; i++) {
+    const star = document.getElementById(`star${i}`);
+    star.classList.remove("earned");
+  }
+  
+  // Animate stars
+  setTimeout(() => {
+    for (let i = 1; i <= starsEarned; i++) {
+      const star = document.getElementById(`star${i}`);
+      star.classList.add("earned");
+    }
+  }, 200);
+  
+  completeModal.classList.remove("hidden");
+}
+
+function showLevelSelect() {
+  const grid = document.getElementById("levelGrid");
+  grid.innerHTML = "";
+  
+  for (let i = 1; i <= LEVELS.length; i++) {
+    const btn = document.createElement("button");
+    btn.className = "level-btn";
+    btn.textContent = i;
+    btn.addEventListener("click", () => loadLevel(i));
+    grid.appendChild(btn);
+  }
+  
+  levelSelectModal.classList.remove("hidden");
 }
 
 async function solveCurrentPuzzle() {
   const payload = { bottles: gameState };
   statusText.textContent = "Calculating solution...";
+  solveBtn.disabled = true;
 
   try {
     const response = await fetch("/api/solve", {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify(payload)
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
     });
 
     const data = await response.json();
 
     if (!data.solved) {
-      statusText.textContent = "No solution found for this puzzle.";
+      statusText.textContent = "No solution found!";
       movesList.innerHTML = "";
       return;
     }
 
     movesList.innerHTML = "";
+    document.getElementById("movesTotal").textContent = data.moves.length;
     data.moves.forEach((move) => {
       const li = document.createElement("li");
       li.textContent = move;
       movesList.appendChild(li);
     });
 
-    statusText.textContent = `Solved in ${data.moves.length} moves.`;
+    statusText.textContent = `Solution: ${data.moves.length} moves`;
+    solutionPanel.classList.add("visible");
   } catch (err) {
-    statusText.textContent = "Solver failed to respond.";
+    statusText.textContent = "Failed to load solution.";
+  } finally {
+    solveBtn.disabled = false;
   }
 }
 
 resetBtn.addEventListener("click", resetGame);
-exampleBtn.addEventListener("click", loadExample);
 solveBtn.addEventListener("click", solveCurrentPuzzle);
+backBtn.addEventListener("click", showLevelSelect);
+closeSolutionBtn.addEventListener("click", () => solutionPanel.classList.remove("visible"));
+nextLevelBtn.addEventListener("click", () => {
+  if (currentLevel < LEVELS.length) loadLevel(currentLevel + 1);
+});
+retryBtn.addEventListener("click", resetGame);
+closeLevelSelectBtn.addEventListener("click", () => levelSelectModal.classList.add("hidden"));
 
-renderBoard();
+loadLevel(1);

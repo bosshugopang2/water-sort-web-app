@@ -3,34 +3,30 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Water Sort Puzzle Solver</title>
+  <title>Water Sort Puzzle Game + Solver</title>
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <div class="container">
-    <h1>Water Sort Puzzle Solver</h1>
+  <div class="app">
+    <header class="topbar">
+      <h1>Water Sort Puzzle</h1>
+      <div class="status" id="statusText">Select a bottle to move from.</div>
+    </header>
 
-    <div class="panel">
-      <label for="puzzleInput">Puzzle JSON</label>
-      <textarea id="puzzleInput" rows="18">{
-  "bottles": [
-    ["GREEN", "RED", "RED", "RED"],
-    ["GREEN", "GREEN", "GREEN", "RED"],
-    ["EMPTY", "EMPTY", "EMPTY", "EMPTY"]
-  ]
-}</textarea>
+    <section class="controls">
+      <button id="resetBtn">Reset</button>
+      <button id="exampleBtn">Example Puzzle</button>
+      <button id="solveBtn" class="primary">Solve for Me</button>
+    </section>
 
-      <div class="actions">
-        <button id="solveBtn">Solve</button>
-        <button id="loadExampleBtn" class="secondary">Load Example</button>
-      </div>
-    </div>
+    <section class="board-wrap">
+      <div id="board" class="board" aria-label="Water sort board"></div>
+    </section>
 
-    <div class="panel">
+    <section class="solution-panel">
       <h2>Solution</h2>
-      <div id="status">Waiting for input...</div>
       <ol id="movesList"></ol>
-    </div>
+    </section>
   </div>
 
   <script src="script.js"></script>

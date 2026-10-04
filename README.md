@@ -1,6 +1,6 @@
 # water-sort-web-app
 
-A web app version of the original Go-based water sort puzzle solver.
+A water sort puzzle game plus a solver.
 
 ## Run locally
 
@@ -14,7 +14,14 @@ Then open:
 http://localhost:8080
 ```
 
-## Example Puzzle
+## What you can do
+
+- Play the puzzle directly in the browser
+- Click bottles to pour liquids
+- Click the Solve button to get the exact moves from the Go solver
+- Use the example puzzle or input your own JSON
+
+## Example puzzle
 
 ```json
 {
@@ -25,7 +32,3 @@ http://localhost:8080
   ]
 }
 ```
-
-## Notes
-
-This keeps the original solver logic and wraps it in a simple browser frontend so it can be used on a phone or desktop browser.
